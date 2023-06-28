@@ -1,0 +1,241 @@
+// Define the pins for switches and LEDs
+const int switchPins[] = {A0, A1, A2, A3, A4, A5};
+const int ledPins[] = {5, 6, 8, 9, 10, 11, 12, 13};
+const int numSongs = 6;
+
+const int piezoPin = 7;  // Pin connected to the piezo buzzer
+
+// Define the song names
+const char* songNames[] = {
+  "Twinkle Twinkle Little Star",
+  "Baa Baa Black Sheep",
+  "London Bridge is falling",
+  "Five Little Ducks",
+  "If you're Happy and You Know it",
+  "Rain Rain Go Away"
+};
+
+// Define the LED pattern for each song
+const int lightPatterns[][8] = {
+  {1, 0, 1, 0, 1, 0, 1, 0},  // Twinkle Twinkle Little Star
+  {1, 1, 0, 1, 1, 0, 1, 1},  // Baa Ba2a Black Sheep
+  {1, 0, 0, 1, 0, 0, 1, 0},  // London Bridge is falling
+  {1, 1, 1, 1, 1, 0, 1, 1},  // Five Little Ducks
+  {1, 1, 1, 1, 0, 0, 0, 1},  // If you're Happy and You Know it
+  {0, 0, 0, 0, 0, 1, 1, 1}   // Rain Rain Go Away
+};
+
+void playTone(int tone, int duration) {
+  for (long i = 0; i < duration * 1000L; i += tone * 2) {
+    digitalWrite(piezoPin, HIGH); //Play speaker
+    delayMicroseconds(tone);
+    digitalWrite(piezoPin, LOW); //Turn off
+    delayMicroseconds(tone);
+  }
+}
+
+void playNote(char note, int duration) {
+  //Array for notes
+  char names[] = {'c', 'd', 'e', 'f', 'g', 'a', 'b', 'C', 'Bb'};
+
+  //Array for tones
+  int tones[] = {1915, 1700, 1519, 1432, 1275, 1136, 1014, 956, 1128};
+
+  //Play the tone corresponding to the note name
+  for (int i = 0; i < 8; i++) {
+    if (names[i] == note) {
+      playTone(tones[i], duration);
+      break;
+    }
+  }
+}
+
+void controlLEDs(int songIndex) {
+  // Update the LED states according to the light pattern for the selected song
+  for (int i = 0; i < numSongs; i++) {
+    digitalWrite(ledPins[i], lightPatterns[songIndex][i]);
+  }
+}
+
+void setup() {
+  // Initialize the switch pins as inputs with internal pull-up resistors
+  for (int i = 0; i < numSongs; i++) {
+    pinMode(switchPins[i], INPUT_PULLUP);
+  }
+
+  // Initialize the LED pins as outputs
+  for (int i = 0; i < numSongs; i++) {
+    pinMode(ledPins[i], OUTPUT);
+  }
+
+  pinMode(piezoPin, OUTPUT);
+
+  // Initialize the Serial Monitor
+  Serial.begin(9600);
+  Serial.println("Welcome to Arduino Jukebox!");
+}
+
+void loop() {
+  // Check if any switch is pressed
+  for (int i = 0; i < numSongs; i++) {
+    if (digitalRead(switchPins[i]) == LOW) {
+      playSong(i);
+      break;
+    }
+  }
+}
+
+void playSong(int songIndex) {
+  Serial.print("Playing Song: ");
+  Serial.println(songNames[songIndex]);
+
+  // Turn on the LEDs according to the light pattern for the selected song
+  controlLEDs(songIndex);
+
+  // Play the song using the piezo buzzer
+  switch (songIndex) {
+    case 0:  // Twinkle Twinkle Little Star
+      {
+        int length = 15;
+        int beats[] = {1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 4};
+        char notes[] = "ccggaag ffeeddc ggffeed ggffeed ccggaag ffeeddc";
+        int tempo = 300;
+
+        for (int i = 0; i < length; i++) {
+          if (notes[i] == ' ') {
+            delay(beats[i] * tempo); // rest
+          } else {
+            playNote(notes[i], beats[i] * tempo);
+          }
+
+          //Pause between notes
+          delay(tempo / 2);
+        }
+        break;
+      }
+    case 1:  // Baa Baa Black Sheep
+      {
+        int length = 57;
+        int beats[] = {
+          1, 1, 1, 1, 1, 1, 2,
+          1, 1, 1, 1, 1, 1, 2,
+          1, 1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1, 1, 1, 2,
+          1, 1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1, 1, 1, 2,
+          1, 1, 1, 1, 1, 1, 2
+        };
+        char notes[] = "c c g g a a g f f e e d d c g g f f e e d g g f f e e d c c g g a a g f f e e d d c "
+                       "e e e d c g g g f f f e e e d c c g g a a g f f e e d d c g g g f f f e e e d "
+                       "f f e e e d";
+        int tempo = 200;
+
+        for (int i = 0; i < length; i++) {
+          if (notes[i] == ' ') {
+            delay(beats[i] * tempo); // rest
+          } else {
+            playNote(tolower(notes[i]), beats[i] * tempo);
+          }
+
+          // Pause between notes
+          delay(tempo / 2);
+        }
+        break;
+      }
+    case 2:  // London Bridge is falling down
+      {
+        int length = 33;
+        int beats[] = {
+          1, 1, 1, 1, 2, 1, 2, 2, 1, 2, 2, 1, 2, 1, 1, 1, 1, 2, 1, 2,
+          1, 1, 1, 1
+        };
+        char notes[] = "gagfefgdefefggagfefgdgec";
+        int tempo = 300;
+
+        for (int i = 0; i < length; i++) {
+          if (notes[i] == ' ') {
+            delay(beats[i] * tempo); // rest
+          } else {
+            playNote(notes[i], beats[i] * tempo);
+          }
+
+          // Pause between notes
+          delay(tempo / 2);
+        }
+        break;
+      }
+    case 3:  // Five Little Ducks
+      {
+        int length = 33;
+        int beats[] = {
+          2, 1, 1, 2, 1, 1, 1, 2, 2, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1, 2,
+          2, 2, 1, 1, 2, 1, 1, 2, 1, 1, 2, 2, 2
+        };
+        char notes[] = "bdddbbaaadddaaggbddbaaaaaddaaagg";
+        int tempo = 250;
+
+        for (int i = 0; i < length; i++) {
+          if (notes[i] == ' ') {
+            delay(beats[i] * tempo); // rest
+          } else {
+            playNote(notes[i], beats[i] * tempo);
+          }
+
+          //Pause between notes
+          delay(tempo / 2);
+        }
+        break;
+      }
+   case 4: // If you're Happy and You Know it
+{
+  int length = 50;
+  int beats[] = {2, 2, 1, 1, 2, 2, 2, 1, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 1, 2, 2, 2, 2, 2, 1, 1, 2, 2, 1, 1, 2, 2, 1, 1, 2, 2, 2, 1, 2, 2, 1, 1, 2, 2, 2, 1, 2, 2, 1};
+  char notes[] = "ccffffffefgccggggggfgaffBBBBddBBaaggffaaaggffeedef";
+  int tempo = 150;
+
+  for (int i = 0; i < length; i++) {
+    if (notes[i] == ' ') {
+      delay(beats[i] * tempo); // rest
+    } else {
+      playNote(tolower(notes[i]), beats[i] * tempo);
+    }
+
+    // Pause between notes
+    delay(tempo / 2);
+  }
+  break;
+}
+
+
+    case 5:  // Rain Rain Go Away
+      {
+        int length = 24;
+        int beats[] = {2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1};
+        char notes[] = "geggeggeaggeffddffdgeecc";
+        int tempo = 300;
+
+        for (int i = 0; i < length; i++) {
+          if (notes[i] == ' ') {
+            delay(beats[i] * tempo); // rest
+          } else {
+            playNote(notes[i], beats[i] * tempo);
+          }
+
+          //Pause between notes
+          delay(tempo / 2);
+        }
+        break;
+      }
+    default:
+      break;
+  }
+
+  // Turn off the LEDs
+  controlLEDs(-1);
+
+  // Stop the piezo buzzer
+  noTone(piezoPin);
+
+  Serial.println("Song Finished!\n");
+}

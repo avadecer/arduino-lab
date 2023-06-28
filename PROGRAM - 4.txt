@@ -1,0 +1,316 @@
+// Define the pins for LEDs and push buttons
+const int redLED1 = 10;
+const int redLED2 = 9;
+const int redLED3 = 8;
+const int colorLED1 = 7;
+const int colorLED2 = 6;
+const int colorLED3 = 5;
+const int blueLED1 = 4;
+const int blueLED2 = 3;
+const int blueLED3 = 2;
+const int buzzerPin = 11;
+const int switch1 = A0;
+const int switch2 = A1;
+const int switch3 = A2;
+const int switch4 = A3;
+const int switch5 = A4;
+
+// Define the siren tones and their durations
+const int sirenTone1 = 1000;
+const int sirenTone2 = 2000;
+const int sirenTone3 = 3000;
+const int sirenTone4 = 4000;
+const int sirenTone5 = 5000;
+const int sirenDuration = 4500;
+
+// Define the running light patterns
+const int pattern1[] = {redLED1, colorLED1, blueLED1};
+const int pattern2[] = {redLED2, colorLED2, blueLED2};
+const int pattern3[] = {redLED3, colorLED3, blueLED3};
+const int patternLength = 3;
+
+// Variables to store current siren tone and pattern
+int currentTone = 0;
+int currentPattern = 0;
+
+// Variables to store previous switch states
+int previousSwitch1State = LOW;
+int previousSwitch2State = LOW;
+int previousSwitch3State = LOW;
+int previousSwitch4State = LOW;
+int previousSwitch5State = LOW;
+
+// Variable to store debounce delay
+const int debounceDelay = 50;
+
+void setup() {
+  // Set the LED pins as OUTPUT
+  pinMode(redLED1, OUTPUT);
+  pinMode(redLED2, OUTPUT);
+  pinMode(redLED3, OUTPUT);
+  pinMode(colorLED1, OUTPUT);
+  pinMode(colorLED2, OUTPUT);
+  pinMode(colorLED3, OUTPUT);
+  pinMode(blueLED1, OUTPUT);
+  pinMode(blueLED2, OUTPUT);
+  pinMode(blueLED3, OUTPUT);
+
+  // Set the buzzer pin as OUTPUT
+  pinMode(buzzerPin, OUTPUT);
+
+  // Set the switch pins as INPUT_PULLUP
+  pinMode(switch1, INPUT_PULLUP);
+  pinMode(switch2, INPUT_PULLUP);
+  pinMode(switch3, INPUT_PULLUP);
+  pinMode(switch4, INPUT_PULLUP);
+  pinMode(switch5, INPUT_PULLUP);
+}
+
+void loop() {
+  // Check if switch 1 is pressed
+  int switch1State = digitalRead(switch1);
+  if (switch1State == HIGH && previousSwitch1State == LOW) {
+    currentTone = sirenTone1;
+    currentPattern = 0;
+    playSiren();
+  }
+  previousSwitch1State = switch1State;
+
+  // Check if switch 2 is pressed
+  int switch2State = digitalRead(switch2);
+  if (switch2State == LOW && previousSwitch2State == HIGH) {
+    currentTone = sirenTone1;
+    currentPattern = 1;
+    playSiren();
+  }
+  previousSwitch2State = switch2State;
+
+  // Check if switch 3 is pressed
+  int switch3State = digitalRead(switch3);
+  if (switch3State == LOW && previousSwitch3State == HIGH) {
+    currentTone = sirenTone2;
+    currentPattern = 2;
+    playSiren();
+  }
+  previousSwitch3State = switch3State;
+
+  // Check if switch 4 is pressed
+  int switch4State = digitalRead(switch4);
+  if (switch4State == LOW && previousSwitch4State == HIGH) {
+    currentTone = sirenTone3;
+    currentPattern = 3;
+    playSiren();
+  }
+  previousSwitch4State = switch4State;
+
+  // Check if switch 5 is pressed
+  int switch5State = digitalRead(switch5);
+  if (switch5State == LOW && previousSwitch5State == HIGH) {
+    currentTone = sirenTone4;
+    currentPattern = 4;
+    playSiren();
+  }
+  previousSwitch5State = switch5State;
+}
+
+void playSiren() {
+  // Play the siren tone
+  tone(buzzerPin, currentTone, sirenDuration);
+
+  // Display the running light pattern
+  displayPattern(currentPattern);
+}
+
+void displayPattern(int pattern) {
+  for (int i = 0; i < patternLength; i++) {
+    digitalWrite(pattern1[i], LOW);
+    digitalWrite(pattern2[i], LOW);
+    digitalWrite(pattern3[i], LOW);
+  }
+
+  if (pattern == 0) {
+    digitalWrite(redLED1, HIGH);
+    delay(500);
+    digitalWrite(redLED2, HIGH);
+    delay(500);
+    digitalWrite(redLED3, HIGH);
+    delay(500);
+    digitalWrite(colorLED1, HIGH);
+    delay(500);
+    digitalWrite(colorLED2, HIGH);
+    delay(500);
+    digitalWrite(colorLED3, HIGH);
+    delay(500);
+    digitalWrite(blueLED1, HIGH);
+    delay(500);
+    digitalWrite(blueLED2, HIGH);
+    delay(500);
+    digitalWrite(blueLED3, HIGH);
+    
+  } else if (pattern == 1) {
+    digitalWrite(blueLED3, HIGH);
+    delay(500);
+    digitalWrite(blueLED2, HIGH);
+    delay(500);
+    digitalWrite(blueLED1, HIGH);
+    delay(500);
+  	digitalWrite(colorLED3, HIGH);
+    delay(500);
+    digitalWrite(colorLED2, HIGH);
+    delay(500);
+    digitalWrite(colorLED1, HIGH);
+    delay(500);
+    digitalWrite(redLED3, HIGH);
+    delay(500);
+    digitalWrite(redLED2, HIGH);
+    delay(500);
+    digitalWrite(redLED1, HIGH);
+    delay(500);
+    
+  } else if (pattern == 2) {
+    digitalWrite(colorLED2, HIGH);
+    delay(500);
+    digitalWrite(colorLED1, HIGH);
+    digitalWrite(colorLED3, HIGH);
+    delay(500);
+    digitalWrite(redLED3, HIGH);
+    digitalWrite(blueLED1, HIGH);
+    delay(500);
+    digitalWrite(redLED2, HIGH);
+    digitalWrite(blueLED2, HIGH);
+    delay(500);
+    digitalWrite(redLED1, HIGH);
+    digitalWrite(blueLED3, HIGH);
+    delay(500);
+    digitalWrite(redLED1, LOW);
+    digitalWrite(blueLED3, LOW);
+    delay(500);
+     digitalWrite(redLED2, LOW);
+    digitalWrite(blueLED2, LOW);
+    delay(500);
+    digitalWrite(redLED3, LOW);
+    digitalWrite(blueLED1, LOW);
+    delay(500);
+    digitalWrite(colorLED1, LOW);
+    digitalWrite(colorLED3, LOW);
+    delay(500);
+    digitalWrite(colorLED2, LOW);
+    delay(500);
+    
+  } else if (pattern == 3) {
+    digitalWrite(redLED1, HIGH);
+    digitalWrite(blueLED3, HIGH);
+    delay(500);
+    digitalWrite(redLED2, HIGH);
+    digitalWrite(blueLED2, HIGH);
+    delay(500);
+    digitalWrite(redLED3, HIGH);
+    digitalWrite(blueLED1, HIGH);
+    delay(500);
+    digitalWrite(colorLED1, HIGH);
+    digitalWrite(colorLED3, HIGH);
+    delay(500);
+    digitalWrite(colorLED2, HIGH);
+    delay(500);
+    digitalWrite(colorLED2, LOW);
+    delay(500);
+    digitalWrite(colorLED1, LOW);
+    digitalWrite(colorLED3, LOW);
+    delay(500);
+    digitalWrite(redLED3, LOW);
+    digitalWrite(blueLED1, LOW);
+    delay(500);
+    digitalWrite(redLED2, LOW);
+    digitalWrite(blueLED2, LOW);
+    delay(500);
+    digitalWrite(redLED1, LOW);
+    digitalWrite(blueLED3, LOW);
+    delay(500);
+    
+    
+  } else if (pattern == 4) {
+    digitalWrite(redLED1, HIGH);
+    delay(100);
+    digitalWrite(redLED1, LOW);
+    delay(100);
+    digitalWrite(redLED2, HIGH);
+    delay(100);
+    digitalWrite(redLED2, LOW);
+    delay(100);
+    digitalWrite(redLED3, HIGH);
+    delay(100);
+    digitalWrite(redLED3, LOW);
+    delay(100);
+    digitalWrite(colorLED1, HIGH);
+    delay(100);
+    digitalWrite(colorLED1, LOW);
+    delay(100);
+    digitalWrite(colorLED2, HIGH);
+    delay(100);
+    digitalWrite(colorLED2, LOW);
+    delay(100);
+    digitalWrite(colorLED3, HIGH);
+    delay(100);
+    digitalWrite(colorLED3, LOW);
+    delay(100);
+    digitalWrite(blueLED1, HIGH);
+    delay(100);
+    digitalWrite(blueLED1, LOW);
+    delay(100);
+    digitalWrite(blueLED2, HIGH);
+    delay(100);
+    digitalWrite(blueLED2, LOW);
+    delay(100);
+    digitalWrite(blueLED3, HIGH);
+    delay(100);
+    digitalWrite(blueLED3, LOW);
+    delay(100);
+    digitalWrite(blueLED3, HIGH);
+    delay(100);
+    digitalWrite(blueLED3, LOW);
+    delay(100);
+    digitalWrite(blueLED2, HIGH);
+    delay(100);
+    digitalWrite(blueLED2, LOW);
+    delay(100);
+    digitalWrite(blueLED1, HIGH);
+    delay(100);
+    digitalWrite(blueLED1, LOW);
+    delay(100);
+  	digitalWrite(colorLED3, HIGH);
+    delay(100);
+    digitalWrite(colorLED3, LOW);
+    delay(100);
+    digitalWrite(colorLED2, HIGH);
+    delay(100);
+    digitalWrite(colorLED2, LOW);
+    delay(100);
+    digitalWrite(colorLED1, HIGH);
+    delay(100);
+    digitalWrite(colorLED1, LOW);
+    delay(100);
+    digitalWrite(redLED3, HIGH);
+    delay(100);
+    digitalWrite(redLED3, LOW);
+    delay(100);
+    digitalWrite(redLED2, HIGH);
+    delay(100);
+    digitalWrite(redLED2, LOW);
+    delay(100);
+    digitalWrite(redLED1, HIGH);
+    delay(100);
+    digitalWrite(redLED1, LOW);
+    delay(100);
+    digitalWrite(redLED1, HIGH);
+    digitalWrite(redLED2, HIGH);
+    digitalWrite(redLED3, HIGH);
+    digitalWrite(colorLED1, HIGH);
+    digitalWrite(colorLED2, HIGH);
+    digitalWrite(colorLED3, HIGH);
+    digitalWrite(blueLED1, HIGH);
+    digitalWrite(blueLED2, HIGH);
+    digitalWrite(blueLED3, HIGH);
+  }
+
+  delay(500);
+}

@@ -1,0 +1,116 @@
+// Pin connections for 7-segment displays
+const int segmentPins2[7] = {2, 3, 4, 5, 6, 7, 8};
+
+const int segmentPins1[7] = {11, 12, 13, A2, A3, A4, A5};
+
+// Pin connections for common cathodes of the displays
+const int display1CommonPin = 9;
+const int display2CommonPin = 10;
+
+
+// Pin connections for LDRs
+const int ldr1Pin = A0;
+const int ldr2Pin = A1;
+
+
+// Patterns for displaying characters
+const byte helloPattern[7][7] = {
+  {B0000000}, // 'none'
+  {B0000000}, // 'none'
+  {B1110110}, // 'H'
+  {B1111001}, // 'E'
+  {B0111000}, // 'L'
+  {B0111000}, // 'L'
+  {B0111111}  // 'O'
+};
+
+
+const byte byePattern[5][7] = {
+  {B1111100}, // 'b'
+  {B1101110}, // 'y'
+  {B1111001}, // 'E'
+  {B0000000}, // 'none'
+  {B0000000}  // 'none'
+};
+
+
+// Function to display a pattern on the 7-segment display
+void displayPattern1(const byte pattern[]) {
+  for (int i = 0; i < 7; i++) {
+    digitalWrite(segmentPins1[i], bitRead(pattern[0], i));
+  }
+}
+
+void displayPattern2(const byte pattern[]) {
+  for (int i = 0; i < 7; i++) {
+    digitalWrite(segmentPins2[i], bitRead(pattern[0], i));
+  }
+}
+
+void displayHelloPattern() {
+  for (int i = 6; i >= 0; i--) {
+    // Display 'O' on common pin 1
+    displayPattern1(helloPattern[i]);
+    // Display 'O' on common pin 2
+    displayPattern2(helloPattern[(i + 1) % 7]);
+    delay(1000);
+  }
+}
+
+
+
+void displayByePattern() {  
+  for (int i = 0; i <= 4; i++) {
+    // Display 'O' on common pin 1
+    displayPattern2(byePattern[i]);
+    // Display 'O' on common pin 2
+    displayPattern1(byePattern[(i + 4) % 5]);
+    delay(1000);
+  }
+}
+
+
+void setup() {
+  Serial.begin(9600);
+
+// Set segment pins as outputs
+  for (int i = 0; i < 7; i++) {
+    pinMode(segmentPins1[i], OUTPUT);
+    pinMode(segmentPins2[i], OUTPUT);
+  }
+
+
+// Set common cathode pins as outputs
+  pinMode(display1CommonPin, OUTPUT);
+  pinMode(display2CommonPin, OUTPUT);
+}
+
+
+void loop() {
+  // Read the LDR values
+  int ldr1Value = map(analogRead(ldr1Pin), 0, 1023, 0, 100);
+  int ldr2Value = map(analogRead(ldr2Pin), 0, 1023, 0, 100);
+
+
+Serial.print("LDR1 Value: ");
+  Serial.println(ldr1Value);
+  Serial.print("LDR2 Value: ");
+  Serial.println(ldr2Value);
+
+
+// Determine which pattern to display based on LDR values
+  if ((ldr1Value >= 1 && ldr1Value <= 80) && ldr2Value <= 1) {
+    displayHelloPattern();
+  }
+  else if ((ldr2Value >= 1 && ldr2Value <= 80) && ldr1Value <= 1) {
+    displayByePattern();
+  }
+  else {
+    // No valid condition met, turn off all segments
+    for (int i = 0; i < 7; i++) {
+      digitalWrite(segmentPins1[i], LOW);
+      digitalWrite(segmentPins2[i], LOW);
+    }
+    return;  // Exit the loop
+  }
+}
